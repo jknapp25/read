@@ -1,34 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./App.css";
-import { Container, Row, Col } from "react-bootstrap";
-import lorip from "./lorem-ipsum.md";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { Router } from "@reach/router";
+import View from "./components/View";
 export default App;
-var md = require("markdown-it")();
+
+const TOKEN = "5255b63afe2ccb0931f0763ed6169f35597cc4ec";
+
+const GITHUB_BASE_URL = "https://api.github.com/graphql";
+
+const client = new ApolloClient({
+  uri: GITHUB_BASE_URL,
+  cache: new InMemoryCache(),
+  headers: {
+    authorization: `Bearer ${TOKEN}`
+  }
+});
 
 function App() {
-  const [text, setText] = useState("");
-
-  useEffect(() => {
-    fetch(lorip)
-      .then(response => response.text())
-      .then(text => {
-        setText(text);
-      });
-  }, []);
-
-  const markdown = md.render(text);
   return (
-    <div className="App overflow-auto">
-      <Container fluid>
-        <Row>
-          <Col />
-          <Col xs={6}>
-            <div dangerouslySetInnerHTML={{ __html: markdown }} />
-          </Col>
-          <Col />
-        </Row>
-      </Container>
-    </div>
+    <ApolloProvider client={client}>
+      <div className="App overflow-auto">
+        <Router>
+          <View path="/:writer/:title" />
+        </Router>
+      </div>
+    </ApolloProvider>
   );
 }
