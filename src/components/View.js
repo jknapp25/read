@@ -1,22 +1,36 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { Container, Row, Col } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useParams } from "@reach/router";
+import { Octokit } from "@octokit/core";
+import { enrich, getCurrentPosition } from "../utils";
+import User from "./User";
 export default View;
+
 var md = require("markdown-it")();
 
-function View() {
+const octokit = new Octokit({
+  auth: `7a1f9a7102a3ac2ed77bb53e58868a2e238027ae`,
+});
+
+function View({ updatingScrollPos, setUpdatingScrollPos }) {
   const params = useParams();
-  const { title, writer } = params;
+
+  const [updating, setUpdating] = useState(false);
+  const [savedPosition, setSavedPosition] = useState(1);
+  const [currentUsername, setCurrentUsername] = useState("");
+  const [scrolledToView, setScrolledToView] = useState(false);
+  const [usersSha, setUsersSha] = useState("");
+  const [users, setUsers] = useState({});
+
+  const { title, author } = params;
 
   const STORY = gql`
     query GetStory {
-      repository(name: "${title}", owner: "${writer}") {
+      repository(name: "${title}", owner: "${author}") {
         object(expression: "master:story.md") {
-          id
           ... on Blob {
-            id
             text
           }
         }
@@ -24,21 +38,127 @@ function View() {
     }
   `;
 
-  const { loading, error, data } = useQuery(STORY);
-  if (loading || error) return null;
+  const USERS = gql`
+    query GetUsers {
+      repository(name: "${title}", owner: "${author}") {
+        object(expression: "master:users.json") {
+          ... on Blob {
+            text
+            oid
+          }
+        }
+      }
+    }
+  `;
 
-  const markdown = md.render(data.repository.object.text);
+  const {
+    loading: storyLoading,
+    error: storyError,
+    data: storyData,
+  } = useQuery(STORY);
+  const {
+    loading: usersLoading,
+    error: usersError,
+    data: usersData,
+  } = useQuery(USERS);
+
+  useEffect(() => {
+    if (currentUsername && updatingScrollPos && !updating) {
+      updatePosition();
+    }
+
+    async function updatePosition() {
+      setUpdating(true);
+      const currentPosition = getCurrentPosition();
+
+      if (currentPosition > savedPosition) {
+        const updUsers = {
+          ...users,
+          [currentUsername]: currentPosition,
+        };
+        let requestData = {
+          owner: author,
+          repo: title,
+          path: "users.json",
+          message: "Update position",
+          content: window.btoa(JSON.stringify(updUsers)),
+          sha: usersSha,
+        };
+        await octokit
+          .request("PUT /repos/{owner}/{repo}/contents/{path}", requestData)
+          .then((response) => {
+            setUsers(updUsers);
+            setUsersSha(response.data.content.sha);
+            setSavedPosition(currentPosition);
+          });
+      }
+      setUpdatingScrollPos(false);
+      setUpdating(false);
+    }
+  }, [
+    updatingScrollPos,
+    author,
+    title,
+    usersSha,
+    currentUsername,
+    savedPosition,
+    users,
+    setUpdatingScrollPos,
+    updating,
+  ]);
+
+  useEffect(() => {
+    if (currentUsername) {
+      if (!scrolledToView) {
+        const el = document.getElementById("new-content-line");
+        if (el) {
+          el.scrollIntoView();
+          setScrolledToView(true);
+        } else {
+          console.log("could not scroll to view");
+        }
+      }
+    }
+  }, [scrolledToView, currentUsername]);
+
+  if (storyLoading || usersLoading || storyError || usersError) return null;
+
+  if (!Object.keys(users).length)
+    setUsers(JSON.parse(usersData.repository.object.text));
+  if (!usersSha) setUsersSha(usersData.repository.object.oid);
+
+  let html = md.render(storyData.repository.object.text);
+  if (currentUsername) {
+    const pastFurthestPosition = JSON.parse(usersData.repository.object.text)[
+      currentUsername
+    ];
+    html = enrich(html, pastFurthestPosition);
+  }
+
   return (
     <Container fluid>
       <Helmet>
         <title>{title}</title>
       </Helmet>
       <Row>
-        <Col />
-        <Col xs={6}>
-          <div dangerouslySetInnerHTML={{ __html: markdown }} />
+        <Col xs={12} md={3}>
+          <User
+            users={users}
+            setSavedPosition={setSavedPosition}
+            author={author}
+            title={title}
+            octokit={octokit}
+            setCurrentUsername={setCurrentUsername}
+            currentUsername={currentUsername}
+            usersSha={usersSha}
+            setUsersSha={setUsersSha}
+            setScrolledToView={setScrolledToView}
+          />
         </Col>
-        <Col />
+        <Col xs={12} md={6} className="pt-4">
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </Col>
+        <Col xs={12} md={3} />
       </Row>
     </Container>
   );

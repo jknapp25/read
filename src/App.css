@@ -2,3 +2,7 @@
   height: 100vh;
   width: 100%;
 }
+
+hr {
+  border-color: #28a745 !important;
+}
