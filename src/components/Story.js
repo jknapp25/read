@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { navigate } from "@reach/router";
 import { useQuery, gql } from "@apollo/client";
-import { Container, Row, Col } from "react-bootstrap";
+import { Button, Container, Row, Col } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useParams } from "@reach/router";
 import { Octokit } from "@octokit/core";
@@ -140,6 +141,11 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
       </Helmet>
       <Row>
         <Col xs={12} md={3}>
+          <Button
+            variant="link"
+            className="mt-2 pl-0 text-muted"
+            onClick={() => navigate("/")}
+          >{`<- Back to Stories`}</Button>
           <User
             users={users}
             setSavedPosition={setSavedPosition}

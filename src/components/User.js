@@ -46,7 +46,7 @@ function User({
 
   return (
     <>
-      <Dropdown className="mt-4">
+      <Dropdown className="mt-2">
         <Dropdown.Toggle variant="success" id="dropdown-basic">
           {currentUsername || "Who are you?"}
         </Dropdown.Toggle>
