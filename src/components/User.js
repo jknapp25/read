@@ -74,7 +74,7 @@ function User({
       </Dropdown>
       {showAddUserInput && (
         <>
-          <label className="mt-4">What doesth thou call oneself?</label>
+          <label className="mt-4">What doesth thou call oneself???</label>
           <br />
           <InputGroup className="w-75">
             <Form.Control
