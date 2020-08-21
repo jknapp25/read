@@ -10,9 +10,7 @@ export default View;
 
 var md = require("markdown-it")();
 
-const octokit = new Octokit({
-  auth: `7a1f9a7102a3ac2ed77bb53e58868a2e238027ae`,
-});
+const octokit = new Octokit({ auth: process.env.REACT_APP_GITHUB_TOKEN });
 
 function View({ updatingScrollPos, setUpdatingScrollPos }) {
   const params = useParams();
