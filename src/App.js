@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { Router } from "@reach/router";
-import View from "./components/View";
+import Story from "./components/Story";
+import StoryList from "./components/StoryList";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 export default App;
@@ -26,7 +27,8 @@ function App() {
         }}
       >
         <Router>
-          <View
+          <StoryList path="/" />
+          <Story
             path="/:author/:title"
             updatingScrollPos={updatingScrollPos}
             setUpdatingScrollPos={setUpdatingScrollPos}
