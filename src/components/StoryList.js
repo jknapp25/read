@@ -14,6 +14,10 @@ function StoryList() {
       <Row>
         <Col xs={12} md={3} />
         <Col xs={12} md={6} className="pt-4">
+          {/* <img
+            style={{ width: "100px", height: "100px" }}
+            src="https://cdn.jsdelivr.net/gh/jknapp25/exogenesis/images/cover-1.jpg"
+          /> */}
           <h1 className="mb-5 mt-4">Stories</h1>
           {stories.map(({ author, title }) => {
             return (
@@ -25,13 +29,10 @@ function StoryList() {
                 <Card.Body>
                   <Row>
                     <Col xs={3}>
-                      <div
-                        className="bg-red"
-                        style={{
-                          width: "150px",
-                          height: "200px",
-                          backgroundColor: "red",
-                        }}
+                      <img
+                        style={{ width: "100%", height: "auto" }}
+                        src={`https://cdn.jsdelivr.net/gh/${author}/${title}/images/cover-1.jpg`}
+                        alt={`${title}`}
                       />
                     </Col>
                     <Col xs={9}>
