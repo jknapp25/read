@@ -6,3 +6,10 @@
 hr {
   border-color: #28a745 !important;
 }
+
+.story-list-item {
+  transition: 0.2s;
+}
+.story-list-item:hover {
+  border-color: orange !important;
+}
