@@ -8,7 +8,7 @@ import { enrich, getCurrentPosition } from "../utils";
 import User from "./User";
 export default View;
 
-var md = require("markdown-it")();
+const md = require("markdown-it")().use(require("markdown-it-imsize"));
 
 const octokit = new Octokit({ auth: process.env.REACT_APP_GITHUB_TOKEN });
 
