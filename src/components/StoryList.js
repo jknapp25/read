@@ -16,7 +16,7 @@ function StoryList() {
         <Col xs={12} md={6} className="pt-4">
           <h1 className="mb-5 mt-4">Stories</h1>
           {stories.map(({ author, title }) => (
-            <StoryListItem author={author} title={title} />
+            <StoryListItem key={title} author={author} title={title} />
           ))}
         </Col>
         <Col xs={12} md={3} />

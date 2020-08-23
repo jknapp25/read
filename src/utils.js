@@ -1,14 +1,27 @@
 export { enrich, indexes, isInViewport, getCurrentPosition };
 
-function enrich(htmlString, furthestPosition) {
+function enrich(htmlString, { furthestPosition, linkedPosition }) {
   let count = 0;
+
   const enrichedString = htmlString.replace(/(<p>)/g, () => {
     ++count;
-    if (count === furthestPosition) {
-      return `<div id="new-content-line" class="text-success position-absolute" style="transform: translate(-45px, -13px);">New</div><hr><p class="content-anchor">`;
-    } else {
-      return `<p class="content-anchor">`;
+
+    let scrollLineName;
+
+    if (furthestPosition) {
+      scrollLineName = "new-content-line";
+      if (count === furthestPosition) {
+        return `<div id="${scrollLineName}" class="text-success position-absolute" style="transform: translate(-45px, -13px);">New</div><hr><p class="content-anchor" data-pos="${count}">`;
+      }
     }
+
+    if (linkedPosition) {
+      if (count === linkedPosition) {
+        return `<p id="linked-position" class="content-anchor bg-warning" data-pos="${count}">`;
+      }
+    }
+
+    return `<p class="content-anchor" data-pos="${count}">`;
   });
   return enrichedString;
 }

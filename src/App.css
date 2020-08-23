@@ -13,3 +13,21 @@ hr {
 .story-list-item:hover {
   border-color: orange !important;
 }
+
+/* example fade out animation
+@keyframes highlight {
+  0% {
+    background: wa;
+  }
+  100% {
+    background: none;
+  }
+}
+
+#linked-position {
+  animation: highlight 5s;
+} */
+
+p.content-anchor:active {
+  background-color: #ffc107;
+}

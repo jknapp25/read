@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { navigate } from "@reach/router";
+import { useParams, navigate, useLocation } from "@reach/router";
 import { useQuery, gql } from "@apollo/client";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import { Helmet } from "react-helmet";
-import { useParams } from "@reach/router";
 import { Octokit } from "@octokit/core";
 import { enrich, getCurrentPosition } from "../utils";
 import User from "./User";
@@ -12,6 +11,15 @@ export default View;
 const md = require("markdown-it")().use(require("markdown-it-imsize"));
 
 const octokit = new Octokit({ auth: process.env.REACT_APP_GITHUB_TOKEN });
+
+const useParamsQuery = (queryParam) => {
+  const search = new URLSearchParams(useLocation().search);
+  return search.get(queryParam);
+};
+
+function updateClipboard(clip) {
+  navigator.clipboard.writeText(clip);
+}
 
 function View({ updatingScrollPos, setUpdatingScrollPos }) {
   const params = useParams();
@@ -22,6 +30,8 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
   const [scrolledToView, setScrolledToView] = useState(false);
   const [usersSha, setUsersSha] = useState("");
   const [users, setUsers] = useState({});
+
+  const position = parseInt(useParamsQuery("pos"), 10);
 
   const { title, author } = params;
 
@@ -120,6 +130,60 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
     }
   }, [scrolledToView, currentUsername]);
 
+  useEffect(() => {
+    if (position) {
+      const el = document.getElementById("linked-position");
+      if (el) {
+        el.scrollIntoView();
+      } else {
+        console.log("could not scroll to view");
+      }
+    }
+  });
+
+  useEffect(() => {
+    window.addEventListener(
+      "contextmenu",
+      (e) => {
+        e.preventDefault();
+
+        const clickedElIsContentAnchor =
+          e.target.className && e.target.className.includes("content-anchor");
+        if (clickedElIsContentAnchor) {
+          const linkPosition = parseInt(e.target.dataset.pos, 10);
+          const currentUrl = window.location.href;
+          let cleanedUrl = currentUrl;
+          if (currentUrl.indexOf("?") !== -1) {
+            cleanedUrl = currentUrl.substring(0, currentUrl.indexOf("?"));
+          }
+          const link = cleanedUrl + `?pos=${linkPosition}`;
+
+          navigator.permissions
+            .query({ name: "clipboard-write" })
+            .then((result) => {
+              if (result.state === "granted" || result.state === "prompt") {
+                updateClipboard(link);
+              }
+            });
+        }
+
+        return false;
+      },
+      false
+    );
+
+    return () => {
+      window.addEventListener(
+        "contextmenu",
+        (e) => {
+          e.preventDefault();
+          return false;
+        },
+        false
+      );
+    };
+  }, []);
+
   if (storyLoading || usersLoading || storyError || usersError) return null;
 
   if (!Object.keys(users).length)
@@ -127,12 +191,15 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
   if (!usersSha) setUsersSha(usersData.repository.object.oid);
 
   let html = md.render(storyData.repository.object.text);
-  if (currentUsername) {
-    const pastFurthestPosition = JSON.parse(usersData.repository.object.text)[
-      currentUsername
-    ];
-    html = enrich(html, pastFurthestPosition);
-  }
+
+  const enrichProps = {
+    furthestPosition: currentUsername
+      ? JSON.parse(usersData.repository.object.text)[currentUsername]
+      : undefined,
+    linkedPosition: position || undefined,
+  };
+
+  html = enrich(html, enrichProps);
 
   return (
     <Container fluid>

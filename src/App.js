@@ -27,7 +27,7 @@ function App() {
         }}
       >
         <Router>
-          <StoryList path="/" />
+          <StoryList path="/" default />
           <Story
             path="/:author/:title"
             updatingScrollPos={updatingScrollPos}
