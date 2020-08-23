@@ -143,10 +143,8 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
 
   useEffect(() => {
     window.addEventListener(
-      "contextmenu",
+      "click",
       (e) => {
-        e.preventDefault();
-
         const clickedElIsContentAnchor =
           e.target.className && e.target.className.includes("content-anchor");
         if (clickedElIsContentAnchor) {
@@ -174,9 +172,9 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
 
     return () => {
       window.addEventListener(
-        "contextmenu",
+        "click",
         (e) => {
-          e.preventDefault();
+          // e.preventDefault();
           return false;
         },
         false
