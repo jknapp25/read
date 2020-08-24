@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useParams, navigate, useLocation } from "@reach/router";
 import { useQuery, gql } from "@apollo/client";
-import { Button, Container, Row, Col } from "react-bootstrap";
+import { Button, Card, Container, Row, Col } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { Octokit } from "@octokit/core";
 import { enrich, getCurrentPosition } from "../utils";
 import User from "./User";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 export default View;
 
 const md = require("markdown-it")().use(require("markdown-it-imsize"));
@@ -204,12 +205,25 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
         <title>{title}</title>
       </Helmet>
       <Row>
-        <Col xs={{ span: 12, order: 1 }} md={{ span: 3, order: 1 }}>
+        <Col xs={{ span: 6, order: 1 }} md={{ span: 3, order: 1 }}>
           <Button
             variant="link"
-            className="mt-2 pl-0 text-muted"
+            className="mt-2 pl-0 text-muted mb-3"
             onClick={() => navigate("/")}
-          >{`<- Back to Stories`}</Button>
+          >
+            <AiOutlineArrowLeft />
+            <span className="ml-3" style={{ lineHeight: "1.3rem" }}>
+              Stories
+            </span>
+          </Button>
+          <Card>
+            <Card.Body>
+              <small className="text-muted">Author</small>
+              <p>{author}</p>
+              <small className="text-muted">Title</small>
+              <p>{title}</p>
+            </Card.Body>
+          </Card>
         </Col>
         <Col
           xs={{ span: 12, order: 3 }}
@@ -218,7 +232,7 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
         >
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </Col>
-        <Col xs={{ span: 12, order: 2 }} md={{ span: 3, order: 3 }}>
+        <Col xs={{ span: 6, order: 2 }} md={{ span: 3, order: 3 }}>
           <User
             users={users}
             setSavedPosition={setSavedPosition}
