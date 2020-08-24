@@ -174,7 +174,6 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
       window.addEventListener(
         "click",
         (e) => {
-          // e.preventDefault();
           return false;
         },
         false
@@ -205,12 +204,21 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
         <title>{title}</title>
       </Helmet>
       <Row>
-        <Col xs={12} md={3}>
+        <Col xs={{ span: 12, order: 1 }} md={{ span: 3, order: 1 }}>
           <Button
             variant="link"
             className="mt-2 pl-0 text-muted"
             onClick={() => navigate("/")}
           >{`<- Back to Stories`}</Button>
+        </Col>
+        <Col
+          xs={{ span: 12, order: 3 }}
+          md={{ span: 6, order: 2 }}
+          className="pt-4"
+        >
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </Col>
+        <Col xs={{ span: 12, order: 2 }} md={{ span: 3, order: 3 }}>
           <User
             users={users}
             setSavedPosition={setSavedPosition}
@@ -224,10 +232,6 @@ function View({ updatingScrollPos, setUpdatingScrollPos }) {
             setScrolledToView={setScrolledToView}
           />
         </Col>
-        <Col xs={12} md={6} className="pt-4">
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        </Col>
-        <Col xs={12} md={3} />
       </Row>
     </Container>
   );

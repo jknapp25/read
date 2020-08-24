@@ -46,7 +46,7 @@ function User({
 
   return (
     <>
-      <Dropdown className="mt-2">
+      <Dropdown className="mt-2 float-right">
         <Dropdown.Toggle variant="success" id="dropdown-basic">
           {currentUsername || "Who are you?"}
         </Dropdown.Toggle>
@@ -74,9 +74,11 @@ function User({
       </Dropdown>
       {showAddUserInput && (
         <>
-          <label className="mt-4">What doesth thou call oneself???</label>
+          <label className="mt-4 float-right">
+            What doesth thou call oneself???
+          </label>
           <br />
-          <InputGroup className="w-75">
+          <InputGroup className="w-75 float-right">
             <Form.Control
               type="text"
               onChange={(e) => setUN(e.target.value)}
