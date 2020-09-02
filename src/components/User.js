@@ -68,7 +68,7 @@ function User({
               setShowAddUSerInput(true);
             }}
           >
-            I'm the new guy
+            I'm the new person
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
